@@ -6,6 +6,6 @@ Python Application to Check Site Connectivity
 ```
 $ python3 -m venv venv
 $ source venv/bin/activate
-(venv) $ python -m pip install aiohttp
+(venv) $ python3 -m pip install aiohttp
 ```
 
