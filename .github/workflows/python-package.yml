@@ -36,4 +36,5 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pyUnit
       run: |
+        cd /home/runner/work/uptime_checker/uptime_checker
         python3 -m tests
