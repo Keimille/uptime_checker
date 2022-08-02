@@ -3,7 +3,6 @@
 import pathlib
 import sys 
 
-from upchecker.cli import read_user_cli_args
 from upchecker.checker import site_is_online
 from upchecker.cli import display_check_result, read_user_cli_args
 
@@ -18,7 +17,7 @@ def main():
 
 def _get_websites_urls(user_args):
     urls = user_args.urls
-    if user_args.input_file:
+    if urls != user_args.urls:
         urls += _read_urls_from_file(user_args.input_file)
     return urls
 
