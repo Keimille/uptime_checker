@@ -1,4 +1,7 @@
 import unittest
+import sys
+
+sys.path.insert(0, './upchecker/')
 from checker import site_is_online
 
 class TestGetWebsiteUrls(unittest.TestCase):
