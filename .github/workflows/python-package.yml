@@ -37,4 +37,4 @@ jobs:
     - name: Test with pyUnit
       run: |
         cd /home/runner/work/uptime_checker/uptime_checker
-        python3 -m tests
+        python3 tests.py
