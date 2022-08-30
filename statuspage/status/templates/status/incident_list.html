@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <table class="table table-condensed table-bordered table-striped table-hover">
+        <thead>
+            <tr>
+                <td>ID</td>
+                <td>Created</td>
+                <td>Updated</td>
+                <td>User</td>
+                <td>Name</td>
+                <td>Status</td>
+                <td>Visible</td>
+                <td>Description</td>
+                <td>Actions</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for incident in incident_list %}
+                <tr>
+                    <td><A HREF="{% url 'status:incident_detail' incident.pk %}">{{ incident.pk }}</A></td>
+                    <td>{{ incident.created }} ({{ incident.created|timesince }} ago)</td>
+                    <td>{{ incident.updated }} ({{ incident.updated|timesince }} ago)</td>
+                    <td>{{ incident.user.username }}</td>
+                    <td>{{ incident.name }}</td>
+                    <td>{{ incident.get_latest_update.status.name }}</td>
+                    <td>
+                        {% if incident.hidden %}
+                            <i class="fa fa-times" style="color: #FF0000;"></i>
+                        {% else %}
+                            <i class="fa fa-thumbs-o-up" style="color: #00FF00;"></i>
+                        {% endif %}
+                    </td>
+                    <td>{{ incident.get_latest_update.description|truncatewords:25 }}</td>
+                    <td>
+                        <A class="btn btn-primary btn-xs" HREF="{% url 'status:incident_update' incident.pk %}">Update</A>
+                        {% if not incident.hidden %}<A class="btn btn-primary btn-xs" HREF="{% url 'status:incident_hide' incident.pk %}">Hide</A>{% endif %}
+                        <A class="btn btn-danger btn-xs" HREF="{% url 'status:incident_delete' incident.pk %}">Delete</A>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

@@ -33,8 +33,9 @@ INTERNAL_IPS = (
     '127.0.0.1',
 )
 
+
 ADMINS = (
-    ('Aaron C. de Bruyn', 'aaron@heyaaron.com'),
+    ('Name', 'name@email.com'),
 )
 
 MANAGERS = ADMINS

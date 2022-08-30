@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load avatar_tags %}
+{% block exthead %}
+    <meta http-equiv="refresh" content="60">
+{% endblock %}
+{% block menubar %}
+{% endblock %}
+
+{% block content %}
+    {% if STATUS_LOGO_URL %}
+        <div>
+            <div class="pull-right"><img src="{{ STATUS_LOGO_URL }}" /></div>
+        </div>
+    {% endif %}
+    {% if status_level %}
+        <p class="alert alert-{{ status_level }}">{% if status_level == 'success' %}There are no known issues at this time{% else %}Some systems are experiencing issues{% endif %}</p>
+    {% endif %}
+    {% for incident in incident_list %}
+        {% include "status/partials/incident.html" with with_callout=True %}
+    {% endfor %}
+    {% if STATUS_TICKET_URL %}
+    <div class="row">
+        <div class="col-md-6">
+            <p>If you are having an issue that is not listed above, please turn in a ticket!</p>
+            <p><a class="btn btn-primary btn-lg" href="{{ STATUS_TICKET_URL }}" role="button"><i class="glyphicon glyphicon-pencil"></i> New Ticket!</a></p>
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}
