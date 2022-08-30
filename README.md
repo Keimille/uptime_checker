@@ -9,6 +9,6 @@ Inspired by [Darkpixel Status Page](https://github.com/darkpixel/statuspage)
 ```
 $ python3 -m venv venv
 $ source venv/bin/activate
-(venv) $ python3 -m pip install aiohttp
+(venv) $ python3 -m pip install --upgrade pip
 ```
 
