@@ -44,7 +44,7 @@ class Status(BaseModel):
 
 class Incident(BaseModel):
     """ Creates an incident.  Incidents are displayed at the top of the page until closed. """
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,on_delete=models.DO_NOTHING)
     name = models.CharField(max_length=255)
     hidden = models.BooleanField(default=False)
 
@@ -77,9 +77,9 @@ class Incident(BaseModel):
 
 class IncidentUpdate(BaseModel):
     """ Updates about an incident. """
-    incident = models.ForeignKey(Incident)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL)
-    status = models.ForeignKey(Status)
+    incident = models.ForeignKey(Incident, on_delete=models.DO_NOTHING)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING)
+    status = models.ForeignKey(Status, on_delete=models.DO_NOTHING)
     description = models.TextField()
 
     def __unicode__(self):

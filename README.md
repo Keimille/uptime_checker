@@ -10,5 +10,7 @@ Inspired by [Darkpixel Status Page](https://github.com/darkpixel/statuspage)
 $ python3 -m venv venv
 $ source venv/bin/activate
 (venv) $ python3 -m pip install --upgrade pip
+(venv) $ pip install -r requirements.txt
+(venv) $ python3 manage.py migrate 
 ```
 

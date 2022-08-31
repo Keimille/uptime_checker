@@ -1,21 +1,23 @@
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import re_path, include
 from django.contrib import admin
-from django.contrib.auth.views import login, logout
+from django.contrib.auth.views import LoginView, LogoutView
+# from django.contrib.auth.views import login, logout
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.generic import TemplateView, ListView, DetailView
 
 
 admin.autodiscover()
-
 urlpatterns = [
-    url(r'^', include('status.urls', namespace='status', app_name='status')),
-    url(r'^account/login/$', login, {'template_name': 'admin/login.html'}, 'login'),
-    url(r'^account/logout/$', logout, {'template_name': 'admin/logout.html'}, 'logout'),
-    url(r'^avatar/', include('avatar.urls')),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+    re_path(r'^', include('status.urls', namespace='status')),
+    re_path(r'^account/login/$', LoginView.as_view, {'template_name': 'admin/login.html'}, 'login'),
+    re_path(r'^account/logout/$', LogoutView.as_view, {'template_name': 'admin/logout.html'}, 'logout'),
+    re_path(r'^avatar/', include('avatar.urls')),
+    re_path(r'^admin/', admin.site.urls),
+    re_path(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 ]
+
+app_name = 'status'
 
 # if settings.DEBUG:
 #     urlpatterns += url(r'^media/(?P<path>.*)$', 'django.views.static.serve', {
@@ -26,5 +28,5 @@ urlpatterns = [
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
+        re_path(r'^__debug__/', include(debug_toolbar.urls)),
     ]

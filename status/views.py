@@ -37,7 +37,7 @@ def create_incident(request):
         if form.is_valid() and form2.is_valid():
             i = form.save(commit=False)
             i.user = request.user
-            print i
+            print(i)
             i.save()
 
             f = form2.save(commit=False)
