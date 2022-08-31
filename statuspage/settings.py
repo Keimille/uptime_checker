@@ -95,8 +95,8 @@ TEMPLATES = [
 ]
 
 MIDDLEWARE = [
-    'status.middleware.LoginRequiredShimMiddleware',
     'django.middleware.gzip.GZipMiddleware',
+    'status.middleware.LoginRequiredShimMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
