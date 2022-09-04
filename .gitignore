@@ -1,0 +1,5 @@
+venv
+venv/*
+statuspage.db
+.env
+statuspage.db
