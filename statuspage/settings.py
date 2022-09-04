@@ -1,20 +1,23 @@
+from dotenv import load_dotenv
+load_dotenv() 
 import os
 import dj_database_url
+
 
 import logging
 logger = logging.getLogger(__name__)
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-PRODUCTION = os.environ.get('PRODUCTION', False)
+PRODUCTION = os.environ.get('PRODUCTION')
 
 STATUS_TICKET_URL = os.environ.get('STATUS_TICKET_URL', None)
 STATUS_LOGO_URL = os.environ.get('STATUS_LOGO_URL', None)
 STATUS_TITLE = os.environ.get('STATUS_TITLE', None)
 STATUS_ANALYTICS = os.environ.get('STATUS_ANALYTICS', None)
-SLACK_CHANNEL = os.environ.get('SLACK_CHANNEL', '#engineering')
-SLACK_TOKEN = os.environ.get('SLACK_TOKEN', None)
-SLACK_USERNAME = os.environ.get('SLACK_USERNAME', 'STATUSBOT')
+SLACK_CHANNEL = os.environ.get('SLACK_CHANNEL', '#test-logs')
+SLACK_TOKEN = os.environ.get('SLACK_TOKEN')
+SLACK_USERNAME = os.environ.get('SLACK_USERNAME', 'statuspage')
 
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 
@@ -27,7 +30,7 @@ if os.environ.get('PRODUCTION', False) in (True, 'True', 'TRUE', 'true', '1', 1)
     DEBUG = False
 else:
     PRODUCTION = False
-    DEBUG = True
+    DEBUG = False
 
 INTERNAL_IPS = (
     '127.0.0.1',
