@@ -17,6 +17,8 @@ django-extra-views==0.14.0
 django-stronghold==0.4.0
 gunicorn==20.1.0
 honcho==1.1.0
+jaeger-client==4.8.0
+opentelemetry-instrumentation-django==0.33b0
 psycopg2==2.9.3
 python-dotenv
 pytz==2022.2.1
@@ -24,3 +26,5 @@ redis==4.3.4
 django-redis==5.2.0
 django-tastypie==0.14.4
 django-braces==1.15.0
+opentelemetry-api==1.12.0
+opentelemetry-sdk==1.12.0

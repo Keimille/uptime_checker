@@ -14,6 +14,38 @@ from stronghold.decorators import public
 from status.models import Incident, IncidentUpdate
 from status.forms import IncidentCreateForm, IncidentUpdateCreateForm
 
+from opentelemetry import trace
+from opentelemetry.exporter.jaeger.thrift import JaegerExporter
+from opentelemetry.sdk.resources import SERVICE_NAME, Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+
+# from opentelemetry.sdk.trace.export import (
+#     ConsoleSpanExporter,
+#     SimpleSpanProcessor,
+# )
+
+trace.set_tracer_provider(
+    TracerProvider(
+       resource=Resource.create({SERVICE_NAME: "StatusPage"}) 
+    )
+)
+
+tracer = trace.get_tracer(__name__)
+
+jaeger_exporter = JaegerExporter(
+    #service_name="my-helloworld-service",
+    agent_host_name="localhost",
+    agent_port=6831,
+)
+
+# Create a BatchSpanProcessor and add the exporter to it
+span_processor = BatchSpanProcessor(jaeger_exporter)
+
+trace.get_tracer_provider().add_span_processor(span_processor)
+
+            
 import slack
 import slack.chat
 import logging
@@ -21,60 +53,62 @@ logger = logging.getLogger(__name__)
 
 
 def send_to_slack(message, channel='engineering', username='statusbot', emoji=':statusbot:', override_debug=False):
-    slack.api_token = settings.SLACK_TOKEN
-    if settings.DEBUG and not override_debug:
-        logger.info('Diverting from %s to dev while in debug mode as %s: %s' % (channel, username, message))
-        slack.chat.post_message('dev', 'DEBUG: ' + message, username=username, icon_emoji=emoji)
-    else:
-        logger.info('Sending to channel %s as %s: %s' % (channel, username, message))
-        slack.chat.post_message(channel, message, username=username, icon_emoji=emoji)
+    with tracer.start_as_current_span("server_request"):
+        slack.api_token = settings.SLACK_TOKEN
+        if settings.DEBUG and not override_debug:
+            logger.info('Diverting from %s to dev while in debug mode as %s: %s' % (channel, username, message))
+            slack.chat.post_message('dev', 'DEBUG: ' + message, username=username, icon_emoji=emoji)
+        else:
+            logger.info('Sending to channel %s as %s: %s' % (channel, username, message))
+            slack.chat.post_message(channel, message, username=username, icon_emoji=emoji)
 
 
 def create_incident(request):
-    if request.method == 'POST':
-        form = IncidentCreateForm(request.POST)
-        form2 = IncidentUpdateCreateForm(request.POST)
-        if form.is_valid() and form2.is_valid():
-            i = form.save(commit=False)
-            i.user = request.user
-            print(i)
-            i.save()
+    with tracer.start_as_current_span("server_request"):
+        if request.method == 'POST':
+            form = IncidentCreateForm(request.POST)
+            form2 = IncidentUpdateCreateForm(request.POST)
+            if form.is_valid() and form2.is_valid():
+                i = form.save(commit=False)
+                i.user = request.user
+                print(i)
+                i.save()
 
-            f = form2.save(commit=False)
-            f.incident = i
-            f.user = request.user
-            f.save()
+                f = form2.save(commit=False)
+                f.incident = i
+                f.user = request.user
+                f.save()
 
-            if settings.SLACK_CHANNEL and settings.SLACK_TOKEN:
-                if len(f.description) > 50:
-                    description = f.description[:50] + '...'
-                else:
-                    description = f.description
-                try:
-                    message = "<https://%s%s|%s> (%s): %s" % (
-                        get_current_site(request),
-                        reverse('status:incident_detail', args=[i.pk, ]),
-                        i.name,
-                        f.status.name,
-                        description
-                    )
-                    send_to_slack(message, username=settings.SLACK_USERNAME, channel=settings.SLACK_CHANNEL)
-                except Exception as e:
-                    logger.warn('Unable to send to slack: %s' % (e))
+                if settings.SLACK_CHANNEL and settings.SLACK_TOKEN:
+                    if len(f.description) > 50:
+                        description = f.description[:50] + '...'
+                    else:
+                        description = f.description
+                    try:
+                        message = "<https://%s%s|%s> (%s): %s" % (
+                            get_current_site(request),
+                            reverse('status:incident_detail', args=[i.pk, ]),
+                            i.name,
+                            f.status.name,
+                            description
+                        )
+                        send_to_slack(message, username=settings.SLACK_USERNAME, channel=settings.SLACK_CHANNEL)
+                    except Exception as e:
+                        logger.warn('Unable to send to slack: %s' % (e))
 
-            return HttpResponseRedirect('/')
-    else:
-        form = IncidentCreateForm()
-        form2 = IncidentUpdateCreateForm()
+                return HttpResponseRedirect('/')
+        else:
+            form = IncidentCreateForm()
+            form2 = IncidentUpdateCreateForm()
+        
+        request_context = RequestContext(request)
+        request_context.push({'form': form, 'form2': form2})
+        t = get_template('status/incident_create_form.html')
+        rendered_template = t.render(request_context.flatten(), request)
+        return HttpResponse(rendered_template)
+        #return get_template('status/incident_create_form.html').render(request_context.flatten(), request)
 
-    request_context = RequestContext(request)
-    request_context.push({'form': form, 'form2': form2})
-    t = get_template('status/incident_create_form.html')
-    rendered_template = t.render(request_context.flatten(), request)
-    return HttpResponse(rendered_template)
-    #return get_template('status/incident_create_form.html').render(request_context.flatten(), request)
-
-    #return render(request, template_name='status/incident_create_form.html', context=request_context)
+        #return render(request, template_name='status/incident_create_form.html', context=request_context)
 
 
 class DashboardView(ListView):
